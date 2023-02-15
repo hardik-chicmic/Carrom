@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Prefab, instantiate, Vec3, SpriteFrame, Sprite, UITransform } from 'cc';
+import { _decorator, Component, Node, Prefab, instantiate, Vec3, SpriteFrame, Sprite, UITransform, JsonAsset } from 'cc';
 const { ccclass, property } = _decorator;
 import puckColor from './puckColor';
 
@@ -9,12 +9,14 @@ export class board extends Component {
     @property({type: Prefab})
     puck: Prefab = null;
 
-    rows = 5;
+    @property({type: JsonAsset})
+    jsonFile: JsonAsset = null;
 
+    rows = 5;   
+
+    
     onLoad(){
-        let instances = 10;
-        console.log("Onload Started");
-        this.setPuck(instances, puckColor.black);
+        this.setPuck();
     }
 
     /**
@@ -24,38 +26,60 @@ export class board extends Component {
      */
 
 
-    
-    setPuck(instances, index){
-        let puckHeight;
-        let puckWidth;
-        let puck;
-
-      
-        for(let j=0;j<this.rows;j++){
-            let currentPos = this.node.getChildByName("Node").getPosition();
-            let gap = this.node.getChildByName("Node").getComponent(UITransform).width - (3*puckWidth);
-            currentPos.x+= gap/2;
-            let noOfPucks = 3;
-            // currentPos.x+= gap/2;
-            for(let j=0;j<noOfPucks;j++){
-                puck = instantiate(this.puck);
-                puckWidth = puck.getComponent(UITransform).width;
-                puckHeight = puck.getComponent(UITransform).height;
-
-                let puckImage = puck.getComponent(puckManager).getPuck(index);
-                puck.getComponent(Sprite).spriteFrame = puckImage;
-
+    /**
+     * Setting the pucks on board in a particular pattern
+     */
+    setPuck(){
+        let gapCount = 2;
+        let count = 3;
+        let row = 0;
+        let rightIndex = 0;
+        for(let i=0;i<this.rows;i++){
+            for(let j=0;j<count;j++){
+                let refNode = this.node.getChildByName("Ref");
                 
-                puck.setPosition(currentPos);
-                currentPos.x += 20;
-                this.node.addChild(puck)
+                let refHeight = refNode.getComponent(UITransform).height;
+                let refWidth = refNode.getComponent(UITransform).width;
+
+                let puck = instantiate(this.puck);
+                let puckHeight = puck.getComponent(UITransform).height;
+                let puckWidth = puck.getComponent(UITransform).width;
+                let puckPos = puck.getPosition();
+
+                let puckReq = this.jsonFile.json[rightIndex].color;
+                
+                
+                let image = puck.getComponent(puckManager).getPuck(puckColor[puckReq])
+                
+                puck.getComponent(Sprite).spriteFrame = image;
+
+                let gap = refWidth - (gapCount*puckWidth);
+
+                if(i >= 1){
+                    puckPos.y-= (i*puckHeight)
+                }
+                if(j == 0){
+                    puckPos.x+= gap/2;
+                }else{
+                    puckPos.x+= gap/2 + (j*puckWidth)
+                }
+                puck.setPosition(puckPos);
+                this.node.addChild(puck);
+                rightIndex++;
             }
-            noOfPucks++;
+            row++;
+            if(row >= this.rows/2){
+                count--;
+                gapCount--;
+            }else{
+                count++;
+                gapCount++;
+            }
+            
         }
     }
 
    
-
     start() {
 
     }
