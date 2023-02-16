@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Prefab, instantiate, Vec3, SpriteFrame, Sprite, UITransform, JsonAsset } from 'cc';
+import { _decorator, Component, Node, Prefab, instantiate, Vec3, SpriteFrame, Sprite, UITransform, JsonAsset, PhysicsSystem2D, EPhysics2DDrawFlags } from 'cc';
 const { ccclass, property } = _decorator;
 import puckColor from './puckColor';
 
@@ -16,7 +16,7 @@ export class board extends Component {
 
     
     onLoad(){
-        this.setPuck();
+        // PhysicsSystem2D.instance.debugDrawFlags = EPhysics2DDrawFlags.All;
     }
 
     /**
@@ -42,8 +42,8 @@ export class board extends Component {
                 let refWidth = refNode.getComponent(UITransform).width;
 
                 let puck = instantiate(this.puck);
-                let puckHeight = puck.getComponent(UITransform).height;
-                let puckWidth = puck.getComponent(UITransform).width;
+                let puckHeight = puck.getComponent(UITransform).height - 20;
+                let puckWidth = puck.getComponent(UITransform).width - 20;
                 let puckPos = puck.getPosition();
 
                 let puckReq = this.jsonFile.json[rightIndex].color;
@@ -81,7 +81,7 @@ export class board extends Component {
 
    
     start() {
-
+        this.setPuck();
     }
 
     update(deltaTime: number) {

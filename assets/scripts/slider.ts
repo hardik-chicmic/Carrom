@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, EventHandler, Slider, UITransform, Input } from 'cc';
+import { _decorator, Component, Node, EventHandler, Slider, UITransform, Input, tween } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('slider')
@@ -7,7 +7,10 @@ export class slider extends Component {
     striker: Node = null;
 
     @property({type: Node})
-    strikerHover = null;
+    strikerHover: Node = null;
+
+    @property({type: Node})
+    blackCircle: Node = null;
 
     sliderWidth = null;
     intitialy = 0;
@@ -21,24 +24,36 @@ export class slider extends Component {
 
         let handle = this.node.getChildByName("Handle")
         handle.on(Input.EventType.TOUCH_START, this.increaseStrikerScale);
-        handle.on(Input.EventType.TOUCH_END, this.reduceStrikerScale)
+        handle.on(Input.EventType.TOUCH_END, this.decreaseStrikerScale);
+        this.strikerHoverRotate();
     }   
     
     
-    increaseStrikerScale = () => {
+    decreaseStrikerScale = () => {
         this.strikerHover.setScale(1, 1);
     }
 
-    reduceStrikerScale = () => {
+    increaseStrikerScale = () => {
         this.strikerHover.setScale(1.5, 1.5);
     }
     
-    
+    /**
+     * Helps in moving the striker in sync with the slider
+     */
     moveStriker = () => {
         let progress = this.node.getComponent(Slider).progress
         progress = this.sliderWidth*progress;
         this.striker.setPosition(this.initialx+progress, this.intitialy)
         this.strikerHover.setPosition(this.initialx+progress, this.intitialy)
+        this.blackCircle.setPosition(this.initialx+progress, this.intitialy)
+    }
+
+    /**
+     * Rotation of hover element over striker
+     */
+    strikerHoverRotate = () => {
+        // by method in tween.The first parameter is duration and second parameter is angle. 
+        tween(this.strikerHover).by(6, {angle: 360}).repeatForever().start();
     }
 
 
