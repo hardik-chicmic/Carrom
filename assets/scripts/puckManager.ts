@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, SpriteFrame, Sprite, instantiate } from 'cc';
+import { _decorator, Component, Node, SpriteFrame, Sprite, instantiate, RigidBody2D} from 'cc';
 const { ccclass, property } = _decorator;
 import { resources } from 'cc';
 import puckColor from './puckColor';
@@ -7,6 +7,7 @@ import puckColor from './puckColor';
 export class puckManager extends Component {
     @property({type: SpriteFrame})
     puckArray: SpriteFrame[] = [];
+
 
     onLoad(){
         
@@ -21,6 +22,7 @@ export class puckManager extends Component {
         return this.puckArray[index]
     }
 
+    
     start(){
         
     }

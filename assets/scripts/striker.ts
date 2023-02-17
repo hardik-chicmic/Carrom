@@ -1,21 +1,19 @@
-import { _decorator, Component, Node, Input, EventTouch, UITransform, Vec2, RigidBody2D } from 'cc';
+import { _decorator, Component, Node, Input, EventTouch, UITransform, Vec2, RigidBody2D, Prefab, Vec3 } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('striker')
 export class striker extends Component {
-    @property({type: Node})
-    blackCircle: Node = null;
-
-    initialScalex = 0;
-    initialScaley = 0;
+    initialScalex:number = 0;
+    initialScaley:number = 0;
 
     cursorStartPos:Vec2;
     cursorEndPos:Vec2;
 
-    count: number = 0;
-
+    startPos:Vec3;
+    flag = true;
     onLoad(){
-        
+        this.node.name = "striker"
+        this.startPos = this.node.getPosition();
         this.node.on(Input.EventType.TOUCH_START, this.getStartLocation)
         this.node.on(Input.EventType.TOUCH_MOVE, this.increaseCircleSize);
         this.node.on(Input.EventType.TOUCH_CANCEL, this.getEndlocation)
@@ -27,10 +25,7 @@ export class striker extends Component {
      */
 
     getStartLocation = (event: EventTouch) => {
-        this.cursorStartPos = event.getUILocation();
-
-        
-        
+        this.cursorStartPos = event.getLocation();
     }
 
 
@@ -39,8 +34,8 @@ export class striker extends Component {
      * @param event Touch Event
      */
     increaseCircleSize = (event: EventTouch) => {
-        
-        this.cursorEndPos = event.getUILocation()
+        this.flag = false; 
+        this.cursorEndPos = event.getLocation()
         let differenceX = this.cursorEndPos.x - this.cursorStartPos.x;
         let differenceY = this.cursorEndPos.y - this.cursorStartPos.y;
 
@@ -48,17 +43,16 @@ export class striker extends Component {
         let euclideanDistance = Math.sqrt(Math.pow(differenceX, 2) + Math.pow(differenceY, 2));
 
         // Setting the angle as tanInverse(difference(y)/difference(x))
-        this.blackCircle.angle = Math.atan2(differenceY, differenceX) * 180/Math.PI + 90;
+        this.node.getChildByName("blackCircle").angle = (Math.atan2(differenceY, differenceX) * 180/Math.PI) + 90;
         
         // Setting the scaling according to euclidean distance
         if(this.initialScalex <= 1 && this.initialScaley <= 1){
-            this.initialScalex = 0.02*euclideanDistance;
-            this.initialScaley = 0.02*euclideanDistance;
-            this.blackCircle.setScale(this.initialScalex, this.initialScaley)
+            this.initialScalex = 0.009*euclideanDistance;
+            this.initialScaley = 0.009*euclideanDistance;
+            this.node.getChildByName("blackCircle").setScale(this.initialScalex, this.initialScaley)
         }
-        this.blackCircle.active = true;
-
-        
+        this.node.getChildByName("blackCircle").active = true;  
+             
     }
 
     /**
@@ -68,14 +62,13 @@ export class striker extends Component {
     getEndlocation = (event: EventTouch) => {
         let differenceX = this.cursorEndPos.x - this.cursorStartPos.x;
         let differenceY = this.cursorEndPos.y - this.cursorStartPos.y;
-       
-        
         this.node.getComponent(RigidBody2D).linearVelocity = new Vec2(-1*differenceX, -1*differenceY)
-        // setTimeout(()=>{
-        //     this.node.getComponent(RigidBody2D).linearDamping = 10;
-        // }, 3000)
         
-        this.blackCircle.active = false;
+        this.node.getComponent(RigidBody2D).linearDamping = 2;
+        this.node.getComponent(RigidBody2D).angularDamping = 2;
+        
+        this.node.getChildByName("strikerHover").active = false;
+        this.node.getChildByName("blackCircle").active = false;
     }
 
     start() {
@@ -83,6 +76,17 @@ export class striker extends Component {
     }
 
     update(deltaTime: number) {
+        let velocity = this.node.getComponent(RigidBody2D).linearVelocity;
+        console.log(velocity);
+        
+        if(velocity.x == 0 && velocity.y == 0 && this.flag == false){
+            console.log(this.flag);
+            
+            this.node.setPosition(this.startPos)
+            this.node.getChildByName("strikerHover").active = true;
+            // this.node.getChildByName("blackCircle").angle+= 180;
+            this.flag = true;
+        }
         
     }
 }

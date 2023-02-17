@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, EventHandler, Slider, UITransform, Input, tween } from 'cc';
+import { _decorator, Component, Node, EventHandler, Slider, UITransform, Input, tween, EventTouch } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('slider')
@@ -6,35 +6,28 @@ export class slider extends Component {
     @property({type:Node})
     striker: Node = null;
 
-    @property({type: Node})
-    strikerHover: Node = null;
-
-    @property({type: Node})
-    blackCircle: Node = null;
-
     sliderWidth = null;
-    intitialy = 0;
+    initialy = 0;
     initialx = 0;
     onLoad(){
         this.node.on('slide', this.moveStriker);
-        this.intitialy = this.striker.getPosition().y
+        this.initialy = this.striker.getPosition().y
         
         this.sliderWidth = this.node.getComponent(UITransform).width;
         this.initialx = (-1) * this.sliderWidth/2;
+       
 
-        let handle = this.node.getChildByName("Handle")
-        handle.on(Input.EventType.TOUCH_START, this.increaseStrikerScale);
-        handle.on(Input.EventType.TOUCH_END, this.decreaseStrikerScale);
+        this.node.getChildByName("Handle").on(Input.EventType.TOUCH_START, this.adjustStrikerScale);
+        this.node.getChildByName("Handle").on(Input.EventType.TOUCH_END, this.adjustStrikerScale);
         this.strikerHoverRotate();
     }   
     
-    
-    decreaseStrikerScale = () => {
-        this.strikerHover.setScale(1, 1);
-    }
-
-    increaseStrikerScale = () => {
-        this.strikerHover.setScale(1.5, 1.5);
+    adjustStrikerScale = (event: EventTouch) => {
+        if(event.type == "touch-start"){
+            this.striker.getChildByName("strikerHover").setScale(1.5, 1.5);
+        }else if(event.type == "touch-end"){
+            this.striker.getChildByName("strikerHover").setScale(1,1);
+        }
     }
     
     /**
@@ -43,9 +36,8 @@ export class slider extends Component {
     moveStriker = () => {
         let progress = this.node.getComponent(Slider).progress
         progress = this.sliderWidth*progress;
-        this.striker.setPosition(this.initialx+progress, this.intitialy)
-        this.strikerHover.setPosition(this.initialx+progress, this.intitialy)
-        this.blackCircle.setPosition(this.initialx+progress, this.intitialy)
+        console.log(progress);
+        this.striker.setPosition(this.initialx+progress, this.initialy)
     }
 
     /**
@@ -53,7 +45,7 @@ export class slider extends Component {
      */
     strikerHoverRotate = () => {
         // by method in tween.The first parameter is duration and second parameter is angle. 
-        tween(this.strikerHover).by(6, {angle: 360}).repeatForever().start();
+        tween(this.striker.getChildByName("strikerHover")).by(6, {angle: 360}).repeatForever().start();
     }
 
 

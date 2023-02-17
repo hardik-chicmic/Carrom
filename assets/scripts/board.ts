@@ -36,23 +36,24 @@ export class board extends Component {
         let rightIndex = 0;
         for(let i=0;i<this.rows;i++){
             for(let j=0;j<count;j++){
-                let refNode = this.node.getChildByName("Ref");
-                
-                let refHeight = refNode.getComponent(UITransform).height;
-                let refWidth = refNode.getComponent(UITransform).width;
+                let refWidth = this.node.getChildByName("Ref").getComponent(UITransform).width;
 
                 let puck = instantiate(this.puck);
-                let puckHeight = puck.getComponent(UITransform).height - 20;
-                let puckWidth = puck.getComponent(UITransform).width - 20;
+                let puckHeight = puck.getComponent(UITransform).height;
+                let puckWidth = puck.getComponent(UITransform).width;
                 let puckPos = puck.getPosition();
 
                 let puckReq = this.jsonFile.json[rightIndex].color;
+
+                // Setting the name of particular puck
+                puck.name = puckReq
                 
-                
+                // Fetching the sprite corresponding to index given by puckColor[puckReq]
                 let image = puck.getComponent(puckManager).getPuck(puckColor[puckReq])
                 
                 puck.getComponent(Sprite).spriteFrame = image;
 
+                // gap increasing according to row number
                 let gap = refWidth - (gapCount*puckWidth);
 
                 if(i >= 1){
