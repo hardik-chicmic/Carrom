@@ -36,7 +36,6 @@ export class slider extends Component {
     moveStriker = () => {
         let progress = this.node.getComponent(Slider).progress
         progress = this.sliderWidth*progress;
-        console.log(progress);
         this.striker.setPosition(this.initialx+progress, this.initialy)
     }
 

@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Input, EventTouch, UITransform, Vec2, RigidBody2D, Prefab, Vec3 } from 'cc';
+import { _decorator, Component, Node, Input, EventTouch, UITransform, Vec2, RigidBody2D, Prefab, Vec3, Collider2D } from 'cc';
 const { ccclass, property } = _decorator;
 
 @ccclass('striker')
@@ -10,8 +10,11 @@ export class striker extends Component {
     cursorEndPos:Vec2;
 
     startPos:Vec3;
-    flag = true;
+    flag = false;
+
+    rigidBodyAdded = null;
     onLoad(){
+        this.rigidBodyAdded = false;
         this.node.name = "striker"
         this.startPos = this.node.getPosition();
         this.node.on(Input.EventType.TOUCH_START, this.getStartLocation)
@@ -34,7 +37,6 @@ export class striker extends Component {
      * @param event Touch Event
      */
     increaseCircleSize = (event: EventTouch) => {
-        this.flag = false; 
         this.cursorEndPos = event.getLocation()
         let differenceX = this.cursorEndPos.x - this.cursorStartPos.x;
         let differenceY = this.cursorEndPos.y - this.cursorStartPos.y;
@@ -46,13 +48,14 @@ export class striker extends Component {
         this.node.getChildByName("blackCircle").angle = (Math.atan2(differenceY, differenceX) * 180/Math.PI) + 90;
         
         // Setting the scaling according to euclidean distance
-        if(this.initialScalex <= 1 && this.initialScaley <= 1){
-            this.initialScalex = 0.009*euclideanDistance;
-            this.initialScaley = 0.009*euclideanDistance;
+        if(this.initialScalex <= 1.5 && this.initialScaley <= 1.5){
+            // console.log(this.initialScalex);
+            // console.log(this.initialScaley);
+            this.initialScalex = 0.01*euclideanDistance;
+            this.initialScaley = 0.01*euclideanDistance;
             this.node.getChildByName("blackCircle").setScale(this.initialScalex, this.initialScaley)
         }
         this.node.getChildByName("blackCircle").active = true;  
-             
     }
 
     /**
@@ -64,11 +67,12 @@ export class striker extends Component {
         let differenceY = this.cursorEndPos.y - this.cursorStartPos.y;
         this.node.getComponent(RigidBody2D).linearVelocity = new Vec2(-1*differenceX, -1*differenceY)
         
-        this.node.getComponent(RigidBody2D).linearDamping = 2;
-        this.node.getComponent(RigidBody2D).angularDamping = 2;
+        // this.node.getComponent(RigidBody2D).linearDamping = 2;
+        // this.node.getComponent(RigidBody2D).angularDamping = 2;
         
         this.node.getChildByName("strikerHover").active = false;
         this.node.getChildByName("blackCircle").active = false;
+        this.flag = true;
     }
 
     start() {
@@ -76,16 +80,25 @@ export class striker extends Component {
     }
 
     update(deltaTime: number) {
-        let velocity = this.node.getComponent(RigidBody2D).linearVelocity;
-        console.log(velocity);
+        // if(!this.rigidBodyAdded){
+        //     this.node.addComponent(RigidBody2D);
+        //     this.node.getComponent(RigidBody2D).gravityScale = 0;
+        //     this.node.addComponent(Collider2D).enabled = true;
+        //     this.rigidBodyAdded = true;
+        // }
+        // console.log(this.node.getComponent(RigidBody2D));
         
-        if(velocity.x == 0 && velocity.y == 0 && this.flag == false){
-            console.log(this.flag);
-            
+        
+        let velocity = this.node.getComponent(RigidBody2D).linearVelocity;
+        
+        
+        if(velocity.x == 0 && velocity.y == 0 && this.flag){
+            this.node.getComponent(RigidBody2D).enabled = true;
+            this.node.getComponent(Collider2D).enabled = true;
             this.node.setPosition(this.startPos)
             this.node.getChildByName("strikerHover").active = true;
-            // this.node.getChildByName("blackCircle").angle+= 180;
-            this.flag = true;
+            this.node.angle = 0;
+            this.flag = false;
         }
         
     }
