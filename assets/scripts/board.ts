@@ -1,4 +1,5 @@
-import { _decorator, Component, Node, Prefab, instantiate, Vec3, SpriteFrame, Sprite, UITransform, JsonAsset, PhysicsSystem2D, EPhysics2DDrawFlags } from 'cc';
+import { _decorator, Component, Node, Prefab, instantiate, Vec3, SpriteFrame, Sprite, UITransform, JsonAsset, PhysicsSystem2D, EPhysics2DDrawFlags, AudioSource } from 'cc';
+import audioInstance from './audioManager';
 const { ccclass, property } = _decorator;
 import puckColor from './puckColor';
 
@@ -12,10 +13,13 @@ export class board extends Component {
     @property({type: JsonAsset})
     jsonFile: JsonAsset = null;
 
+
+
     rows = 5;   
 
     
     onLoad(){
+        this.playBackgroundAudio();
         // PhysicsSystem2D.instance.debugDrawFlags = EPhysics2DDrawFlags.All;
     }
 
@@ -78,6 +82,12 @@ export class board extends Component {
             }
             
         }
+    }
+
+    playBackgroundAudio = () => {
+        let audioSource = this.node.getComponent(AudioSource);
+        audioInstance.passAudioSource(audioSource)
+        audioInstance.playAudio(true);
     }
 
    

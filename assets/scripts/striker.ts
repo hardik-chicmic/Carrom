@@ -1,4 +1,5 @@
-import { _decorator, Component, Node, Input, EventTouch, UITransform, Vec2, RigidBody2D, Prefab, Vec3, Collider2D } from 'cc';
+import { _decorator, Component, Node, Input, EventTouch, UITransform, Vec2, RigidBody2D, Prefab, Vec3, Collider2D, AudioSource } from 'cc';
+import audioInstance from './audioManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('striker')
@@ -12,9 +13,12 @@ export class striker extends Component {
     startPos:Vec3;
     flag = false;
 
-    rigidBodyAdded = null;
+    
+    
+    
     onLoad(){
-        this.rigidBodyAdded = false;
+        
+        // console.log(audioSource);
         this.node.name = "striker"
         this.startPos = this.node.getPosition();
         this.node.on(Input.EventType.TOUCH_START, this.getStartLocation)
@@ -49,8 +53,6 @@ export class striker extends Component {
         
         // Setting the scaling according to euclidean distance
         if(this.initialScalex <= 1.5 && this.initialScaley <= 1.5){
-            // console.log(this.initialScalex);
-            // console.log(this.initialScaley);
             this.initialScalex = 0.01*euclideanDistance;
             this.initialScaley = 0.01*euclideanDistance;
             this.node.getChildByName("blackCircle").setScale(this.initialScalex, this.initialScaley)
@@ -66,31 +68,26 @@ export class striker extends Component {
         let differenceX = this.cursorEndPos.x - this.cursorStartPos.x;
         let differenceY = this.cursorEndPos.y - this.cursorStartPos.y;
         this.node.getComponent(RigidBody2D).linearVelocity = new Vec2(-1*differenceX, -1*differenceY)
-        
-        // this.node.getComponent(RigidBody2D).linearDamping = 2;
-        // this.node.getComponent(RigidBody2D).angularDamping = 2;
-        
+    
         this.node.getChildByName("strikerHover").active = false;
         this.node.getChildByName("blackCircle").active = false;
         this.flag = true;
+        this.playStrikerAudio();
     }
 
+    playStrikerAudio = () => {
+        let audioSource = this.node.getComponent(AudioSource)
+        audioInstance.passAudioSource(audioSource)
+        audioInstance.playAudio(false);
+    }
+
+    
     start() {
         
     }
 
     update(deltaTime: number) {
-        // if(!this.rigidBodyAdded){
-        //     this.node.addComponent(RigidBody2D);
-        //     this.node.getComponent(RigidBody2D).gravityScale = 0;
-        //     this.node.addComponent(Collider2D).enabled = true;
-        //     this.rigidBodyAdded = true;
-        // }
-        // console.log(this.node.getComponent(RigidBody2D));
-        
-        
         let velocity = this.node.getComponent(RigidBody2D).linearVelocity;
-        
         
         if(velocity.x == 0 && velocity.y == 0 && this.flag){
             this.node.getComponent(RigidBody2D).enabled = true;
@@ -99,6 +96,7 @@ export class striker extends Component {
             this.node.getChildByName("strikerHover").active = true;
             this.node.angle = 0;
             this.flag = false;
+            
         }
         
     }

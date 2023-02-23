@@ -38,7 +38,6 @@ export class Collisions extends Component {
   whitecount = 0;
   redCount = 0;
   score = 0;
-  prevScore = 0;
 
   onLoad() {
     this.blackHoleArr[0].name = "hole1";
@@ -84,29 +83,25 @@ export class Collisions extends Component {
       otherCollider.node.name == "striker"
     ) {
       console.log("hole2 detected");
-      // this.striker.getComponent(RigidBody2D).enabled = false;
-      // this.striker.getComponent(Collider2D).enabled = false;
+      
     } else if (
       selfCollider.node.name == "hole3" &&
       otherCollider.node.name == "striker"
     ) {
       console.log("hole3 detected");
-      // this.striker.getComponent(RigidBody2D).enabled = false;
-      // this.striker.getComponent(Collider2D).enabled = false;
+      
     } else if (
       selfCollider.node.name == "hole4" &&
       otherCollider.node.name == "striker"
     ) {
       console.log("hole4 detected");
-      // this.striker.getComponent(RigidBody2D).enabled = false;
-      // this.striker.getComponent(Collider2D).enabled = false;
+      
     } else if (
       selfCollider.node.name == "hole4" &&
       otherCollider.node.name == "striker"
     ) {
       console.log("hole4 detected");
-      this.striker.getComponent(RigidBody2D).enabled = false;
-      this.striker.getComponent(Collider2D).enabled = false;
+      
     } else {
       let collidedPuck: Node = otherCollider.node;
       if (collidedPuck.name == "white") {
@@ -122,11 +117,7 @@ export class Collisions extends Component {
       
       this.score = Number(this.blackCount*10) + Number(this.whitecount*20) + Number(this.redCount*50);
       sys.localStorage.setItem("Score", String(this.score))
-      this.prevScore = this.score;
-      // console.log(this.score)
-      // console.log(this.prevScore);
       
-     
       // Destroy should be kept in setTimeout
       setTimeout(() => {
         collidedPuck.destroy()

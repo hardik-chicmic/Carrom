@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, SpriteFrame, Sprite } from 'cc';
+import { _decorator, Component, Node, SpriteFrame, Sprite, tween, director, UITransform } from 'cc';
 const { ccclass, property } = _decorator;
 
 import singletonInstance from './singleton';
@@ -8,6 +8,16 @@ import { resources } from 'cc';
 @ccclass('resourceManager')
 export class resourceManager extends Component {
     spriteArr:SpriteFrame[] = []
+
+    @property({type: Node})
+    loader: Node = null;
+
+    @property({type:Node})
+    background: Node = null;
+
+    onLoad(){
+        director.preloadScene("Login")
+    }
 
     /**
      * This function waits for the promise to resolve and if it is resolved then it is assigning the array to spriteArr
@@ -23,7 +33,10 @@ export class resourceManager extends Component {
 
     fetchBackground(){
         let backgroundImage = this.spriteArr[singletonInstance.indexAsset("bg")];
-        this.node.getComponent(Sprite).spriteFrame = backgroundImage;
+        this.background.getComponent(Sprite).spriteFrame = backgroundImage;
+        
+
+        tween(this.loader).by(4, {angle: -360}).repeatForever().start();
         
         setTimeout(() => {
             this.node.getChildByName("loading icon").active = false;
@@ -34,9 +47,7 @@ export class resourceManager extends Component {
     }
 
     fetchLogo(){
-        let logo = this.spriteArr[singletonInstance.indexAsset("logo")];
-        let oneVone = this.node.getChildByName("1v1");
-        oneVone.getComponent(Sprite).spriteFrame = logo;
+        director.loadScene("Login")
     }
     
 
