@@ -31,9 +31,6 @@ export class Collisions extends Component {
   @property({type: Node})
   Score: Node = null;
 
-  @property({type:Prefab})
-  puck:Prefab = null;
-
   blackCount = 0;
   whitecount = 0;
   redCount = 0;

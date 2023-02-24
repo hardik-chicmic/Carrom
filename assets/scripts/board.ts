@@ -1,8 +1,8 @@
 import { _decorator, Component, Node, Prefab, instantiate, Vec3, SpriteFrame, Sprite, UITransform, JsonAsset, PhysicsSystem2D, EPhysics2DDrawFlags, AudioSource } from 'cc';
 import audioInstance from './audioManager';
 const { ccclass, property } = _decorator;
-import puckColor from './puckColor';
 
+import puckColor from './puckColor';
 import { puckManager } from './puckManager';
 
 @ccclass('board')
@@ -16,10 +16,8 @@ export class board extends Component {
 
 
     rows = 5;   
-
-    
     onLoad(){
-        this.playBackgroundAudio();
+        // this.playBackgroundAudio();
         // PhysicsSystem2D.instance.debugDrawFlags = EPhysics2DDrawFlags.All;
     }
 
@@ -33,14 +31,10 @@ export class board extends Component {
     /**
      * Setting the pucks on board in a particular pattern
      */
-    setPuck(){
-        let gapCount = 2;
-        let count = 3;
-        let row = 0;
-        let rightIndex = 0;
+    setPuck(gapCount, count, row, rightIndex){
         for(let i=0;i<this.rows;i++){
             for(let j=0;j<count;j++){
-                let refWidth = this.node.getChildByName("Ref").getComponent(UITransform).width;
+                let refWidth = 400;
 
                 let puck = instantiate(this.puck);
                 let puckHeight = puck.getComponent(UITransform).height;
@@ -48,7 +42,7 @@ export class board extends Component {
                 let puckPos = puck.getPosition();
 
                 let puckReq = this.jsonFile.json[rightIndex].color;
-
+                
                 // Setting the name of particular puck
                 puck.name = puckReq
                 
@@ -84,15 +78,15 @@ export class board extends Component {
         }
     }
 
-    playBackgroundAudio = () => {
-        let audioSource = this.node.getComponent(AudioSource);
-        audioInstance.passAudioSource(audioSource)
-        audioInstance.playAudio(true);
-    }
+    // playBackgroundAudio = () => {
+    //     let audioSource = this.node.getComponent(AudioSource);
+    //     audioInstance.passAudioSource(audioSource)
+    //     audioInstance.playAudio(true);
+    // }
 
    
     start() {
-        this.setPuck();
+        this.setPuck(2,3,0,0);
     }
 
     update(deltaTime: number) {

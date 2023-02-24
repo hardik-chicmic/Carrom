@@ -72,14 +72,14 @@ export class striker extends Component {
         this.node.getChildByName("strikerHover").active = false;
         this.node.getChildByName("blackCircle").active = false;
         this.flag = true;
-        this.playStrikerAudio();
+        // this.playStrikerAudio();
     }
 
-    playStrikerAudio = () => {
-        let audioSource = this.node.getComponent(AudioSource)
-        audioInstance.passAudioSource(audioSource)
-        audioInstance.playAudio(false);
-    }
+    // playStrikerAudio = () => {
+    //     let audioSource = this.node.getComponent(AudioSource)
+    //     audioInstance.passAudioSource(audioSource)
+    //     audioInstance.playAudio(false);
+    // }
 
     
     start() {

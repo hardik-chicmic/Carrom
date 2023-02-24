@@ -1,4 +1,5 @@
-import { _decorator, Component, Node, Button, EditBox, director } from 'cc';
+import { _decorator, Component, Node, Button, EditBox, director, Input } from 'cc';
+import { board } from './board';
 const { ccclass, property } = _decorator;
 
 @ccclass('login')
@@ -15,14 +16,16 @@ export class login extends Component {
 
     // onEnable gets called when nodes active property changes from true to false
     onLoad(){
-        // director.preloadScene("board");
-        this.loginButton.getComponent(Button).node.on("click", this.login)
+        director.preloadScene("board")
+        this.loginButton.on(Input.EventType.TOUCH_START, this.login)
     }
 
     login = () => {
-        let emailReg = new RegExp("[-A-Za-z0-9!#$%&'*+/=?^_`{|}~]+(?:\.[-A-Za-z0-9!#$%&'*+/=?^_`{|}~]+)*@(?:[A-Za-z0-9](?:[-A-Za-z0-9]*[A-Za-z0-9])?\.)+[A-Za-z0-9](?:[-A-Za-z0-9]*[A-Za-z0-9])?")
+        console.log("check1");
+        
+        // let emailReg = new RegExp("[-A-Za-z0-9!#$%&'*+/=?^_`{|}~]+(?:\.[-A-Za-z0-9!#$%&'*+/=?^_`{|}~]+)*@(?:[A-Za-z0-9](?:[-A-Za-z0-9]*[A-Za-z0-9])?\.)+[A-Za-z0-9](?:[-A-Za-z0-9]*[A-Za-z0-9])?")
 
-        let passReg = new RegExp("^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})")
+        // let passReg = new RegExp("[0-9]")
 
         const req = new XMLHttpRequest();
         req.open("POST", "http://3.18.231.59:4002/v1/user/login", true)
@@ -31,34 +34,36 @@ export class login extends Component {
             email: this.email.getComponent(EditBox).string,
             password: this.password.getComponent(EditBox).string
         }
-        let headers = {
-            "apiKey": "HUMBLE_d59167bab8280dcvgs445g8a8af98cb428584676e_MINOR",
-            "Content-Type": "application/json"
-        }
-        
-        if(emailReg.test(body["email"]) && passReg.test(body["password"])){
-            console.log(req.response);
-        }else{
-            if(!emailReg.test(body["email"])){
-                console.log("Email dont match");
-                
-            }else if(!passReg.test(body["password"])){
-                console.log("Password dont match");
-                
-            }
-        }
 
-        req.setRequestHeader("apiKey", headers["apiKey"])
-        req.setRequestHeader("Content-Type", headers['Content-Type'])
+       
+        let apiKey =  "HUMBLE_d59167bab8280dcvgs445g8a8af98cb428584676e_MINOR"
+        
+        
+        req.setRequestHeader("apiKey", apiKey)
+        req.setRequestHeader("Content-Type", "application/json")
 
         req.onreadystatechange = function(){
-            console.log(req.response);
             
-            director.loadScene("board")
+            if(req.readyState == 4){
+                console.log("check2  init");
+                director.loadScene("board")
+            }
         }
         
         // Stringify converts it to string
-        req.send(JSON.stringify(body));
+        // if(emailReg.test(body["email"]) && passReg.test(body["password"])){
+            
+        // }else{
+        //     if(body["email"] == "" || body["password"] == ""){
+        //         console.log("The field can't be empty");
+        //     }else if(!emailReg.test(body["email"])){
+        //         console.log("Email dont match");
+        //     }
+        // }
+
+        req.send(JSON.stringify(body))
+        console.log("Check3");
+        
     }
 
     start() {
